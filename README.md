@@ -1,6 +1,6 @@
 ## Content Steering for Adaptive Video Streaming over the Edge-Cloud Continuum: A Hands-on Experience 
 
-This repository was created to host the material for the NOMS'24 tutorial.
+This repository was created to host the materials for the NOMS'24 tutorial.
 
 ### Abstract
 
@@ -34,4 +34,6 @@ Video streaming is among the most used Internet applications nowadays, with many
 6. Current Challenges and Future Opportunities
 
 
-### Practical Exercises
+### Practical Exercises Description
+
+For the practical exercise, you should have installed in your computer the following programs: Python, Docker, Kubernetes and Minikube. You should also download our video player app, the metric-client app, the yaml files for setting up Kuberenetes deployments, and the video files. We expect you to create multiple deployments of cache services and a single deployment of the content steering service in you minikube cluster, using the available yaml files in our repository. Then, you should execute the player and use the metric-client app to feed metrics to the content steering service. Based on the sent metrics, you should see the content steering service interact with the video player to change the url from one cache service to another. After executing this first example, you should download the content steering code and adjust its policy. You should also change the metric-client app to send different metrics to the content steering service to test your new content steering policy.
