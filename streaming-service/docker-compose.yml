@@ -1,0 +1,16 @@
+version: '3'
+
+name: video-streaming-caddy
+
+services:
+  caddy:
+    container_name: video-streaming-caddy
+    image: caddy
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./dataset:/srv
+      - ./certs:/root/certs
