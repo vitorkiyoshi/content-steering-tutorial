@@ -37,3 +37,52 @@ Video streaming is among the most used Internet applications nowadays, with many
 ### Practical Exercises Description
 
 For the practical exercise, you should have installed the following programs on your computer: Python, Docker, Kubernetes, and Minikube. You should also download our video player app, the metric-client app, the YAML files for setting up Kubernetes deployments, and the video files. We expect you to create multiple deployments of cache services and a single deployment of the content steering service in your Minikube cluster using the available YAML files in our repository. Then, you should execute the player and use the metric-client app to feed metrics to the content steering service. Based on the sent metrics, you should see the content steering service interact with the video player to change the URL from one cache service to another. After executing this first example, you should download the content steering code and adjust its policy. You should also change the metric-client app to send different metrics to the content steering service to test your new content steering policy.
+
+
+## Prerequisites:
+
+- [mkcert](https://github.com/FiloSottile/mkcert)
+- [docker](https://www.docker.com/)
+
+
+## Configure Environment Tutorial:
+
+1) Download the tutorial from Github using git.
+
+```shell
+git clone https://github.com/robertovrf/content-steering-tutorial
+```
+
+2) Run the script `create_certs.sh` to create the certs and copies to enable the https in localhost:
+
+```shell
+./create_certs.sh
+```
+
+3) Run the script `create_nodes.sh` to create de regional nodes where the edge services will run:
+
+```shell
+./create_nodes.sh
+```
+
+You alredy can check if the local video streaming is working, accessing the play `dash.js` and try to load the manifest with url: `localhost/manifest.mpd`
+
+
+
+
+## Parameters:
+- `--seed`: Seed
+- `--users`: Total number of users
+- `--abr`: Target ABR decision logic in dash.js. 
+- `--users_config`: Users config
+- `--scenario_config`: Scenarios config
+- `--endpoints`: endpoints which videos are availables
+
+It is important to generate new images for the Users, Video Edge Nodes and CDNs with the Dockerfile from the directories.
+
+
+## How to run
+```shell
+python mininet/icfec-scenario.py --seed=<number of seed> --users=<# users>
+```
+
