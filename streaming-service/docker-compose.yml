@@ -12,5 +12,6 @@ services:
       - '443:443'
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./dataset:/srv
       - ./certs:/root/certs
+      - ../dataset:/srv
+      

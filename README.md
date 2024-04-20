@@ -47,6 +47,14 @@ For the practical exercise, you should have installed the following programs on 
 
 ## Configure Environment Tutorial:
 
+
+Configure network 
+
+```
+docker network create --subnet=172.18.0.0/16 mynet123
+```
+
+
 1) Download the tutorial from Github using git.
 
 ```shell

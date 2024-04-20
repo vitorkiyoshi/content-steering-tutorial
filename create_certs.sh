@@ -1,10 +1,10 @@
 #! /bin/bash
 echo """
 ==================================================
-  Creating certificate for streaming-1.localhost
+  Creating certificate for streaming-service.localhost
 ==================================================
 """
-mkcert streaming-service.localhost
+mkcert streaming-service
 
 echo """
 ==================================================
@@ -12,7 +12,7 @@ echo """
 ==================================================
 """
 
-mv ./streaming-service.localhost.pem ./streaming-service/certs
-mv ./streaming-service.localhost-key.pem ./streaming-service/certs
+mv ./streaming-service.pem ./streaming-service/certs
+mv ./streaming-service-key.pem ./streaming-service/certs
 
 

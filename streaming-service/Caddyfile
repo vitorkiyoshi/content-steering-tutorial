@@ -24,7 +24,7 @@
 }
 
 :443 {
-    tls /root/certs/streaming-service.localhost.pem /root/certs/streaming-service.localhost-key.pem
+    tls /root/certs/streaming-service.pem /root/certs/streaming-service-key.pem
     
     root * /srv
     file_server
