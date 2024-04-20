@@ -13,7 +13,6 @@ from flask import Flask
 from flask import Response
 from flask import request
 from flask import jsonify
-from kubernetes import client
 from flask_cors import CORS, cross_origin
 
 from builder import Builder
@@ -23,8 +22,8 @@ from builder import Builder
 # DEFINES
 ########################################################################
 STEERING_ADDR = 'steering-service'
-STEERING_PORT = int(os.environ.get('STEERING_PORT'))
-CONTENT_TYPE_LATEST = os.environ.get('CONTENT_TYPE_LATEST')
+STEERING_PORT = 30500
+
 
 _builder = Builder()
 
