@@ -36,4 +36,4 @@ class Builder:
             
             clones.append(clone)
             
-        return clonse
+        return clones

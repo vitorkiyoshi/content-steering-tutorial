@@ -48,49 +48,49 @@ For the practical exercise, you should have installed the following programs on 
 ## Configure Environment Tutorial:
 
 
-Configure network 
-
-```
-docker network create --subnet=172.18.0.0/16 mynet123
-```
-
-
-1) Download the tutorial from Github using git.
+## 1. Clone the Tutorial Repository
+First, clone the tutorial repository from GitHub using Git:
 
 ```shell
 git clone https://github.com/robertovrf/content-steering-tutorial
 ```
 
-2) Run the script `create_certs.sh` to create the certs and copies to enable the https in localhost:
+## 2. Set Up Local Streaming Service
+
+### 2.1 Set Up Local Custom Domains and Certificates 
+Edit your local hosts file located at /etc/hosts to assign local custom domain names for streaming and steering services. Then, run the script create_certs.sh to generate certificates and enable HTTPS in localhost:
 
 ```shell
-./create_certs.sh
+./create_certs.sh <streaming-domain> <steering-domain>
 ```
 
-3) Run the script `create_nodes.sh` to create de regional nodes where the edge services will run:
+### 2.1 Download DASH Video Dataset
+
+Download a DASH video from the mmsys dataset and save it to the designated folder named dataset. The dataset offers various codec options such as AV1, AVC, HEVC, and VVC. You can use wget or any other method to download the video.
+
+
+### 2.2 Start Local Streaming Service
+
+Run the script create_streaming.sh to initiate the regional streaming setup where the streaming services will run:
 
 ```shell
-./create_nodes.sh
+./starting_streaming.sh
 ```
 
-You alredy can check if the local video streaming is working, accessing the play `dash.js` and try to load the manifest with url: `localhost/manifest.mpd`
+You can now verify if the local video streaming is operational. Access the [dash.js](https://reference.dashif.org/dash.js/latest/samples/dash-if-reference-player/index.html) player and attempt to load the manifest using the following URL format:
 
-
-
-
-## Parameters:
-- `--seed`: Seed
-- `--users`: Total number of users
-- `--abr`: Target ABR decision logic in dash.js. 
-- `--users_config`: Users config
-- `--scenario_config`: Scenarios config
-- `--endpoints`: endpoints which videos are availables
-
-It is important to generate new images for the Users, Video Edge Nodes and CDNs with the Dockerfile from the directories.
-
-
-## How to run
 ```shell
-python mininet/icfec-scenario.py --seed=<number of seed> --users=<# users>
+https://streaming-service/<streaming path>/manifest.mpd
 ```
 
+Replace <streaming-service> with your streaming domain and <streaming-path> with the path to your video.
+
+## 3. Set Up Local Content Steering 
+
+### 3.1 Set Up Local Content Steering
+
+
+## References
+
+- [mmsys22 Dataset](https://doi.org/10.1145/3524273.3532889) 
+Babak Taraghi, Hadi Amirpour, and Christian Timmerer. 2022. Multi-codec ultra high definition 8K MPEG-DASH dataset. In Proceedings of the 13th ACM Multimedia Systems Conference (MMSys '22). Association for Computing Machinery, New York, NY, USA, 216–220. 
