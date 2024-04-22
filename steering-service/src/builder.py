@@ -3,11 +3,11 @@ class Builder:
         self.build_obj = None
 
 
-    def build(self, nodes, uri):
+    def build(self, nodes, uri, request):
         message = {}
         message['VERSION'] = 1
         message['TTL'] = 10
-        message['RELOAD-URI'] = uri
+        message['RELOAD-URI'] = f'{uri}{request.path}'
 
         if nodes:
             message['PATHWAY-CLONES'] = self.pathway_clones(nodes)

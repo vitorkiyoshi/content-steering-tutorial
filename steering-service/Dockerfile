@@ -1,21 +1,24 @@
-FROM python:3.11-alpine
+FROM ubuntu:focal
 
+##UPDATE
+RUN apt-get update -y
 
-RUN adduser -D steering
-USER steering
-WORKDIR /home/steering
+##PYTHON
+RUN apt-get install -y \
+    python3-pip \
+    python3-dev \ 
+    docker.io
+    
+RUN pip3 install --upgrade pip
 
-ENV PATH="/home/steering/.local/bin:${PATH}"
-ENV PYTHONUNBUFFERED=1
-
-COPY src/app.py /home/steering/
-COPY src/builder.py /home/steering/
-COPY src/monitoring.py /home/steering/
-
-COPY .env /home/steering/
-COPY requirements.txt /home/steering/
+COPY .env /
+COPY requirements.txt /
 
 RUN pip install -r requirements.txt
 
+COPY src/app.py /
+COPY src/builder.py /
+COPY src/monitoring.py /
 
-CMD [ "python", "app.py" ]
+
+CMD [ "python3", "app.py" ]
