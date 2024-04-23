@@ -1,7 +1,6 @@
-class Builder:
+class DashParser:
     def __init__(self):
-        self.build_obj = None
-
+        pass
 
     def build(self, nodes, uri, request):
         message = {}
@@ -12,7 +11,7 @@ class Builder:
         if nodes:
             message['PATHWAY-CLONES'] = self.pathway_clones(nodes)
         
-        message["PATHWAY-PRIORITY"] = ['cdn']
+        message["PATHWAY-PRIORITY"] = [f'edge-{node.id}' for node in nodes] + ['cdn']
 
         return message
 
@@ -23,14 +22,11 @@ class Builder:
         
         for node in nodes:
             clone = {
-                'BASE-ID': 'edge1',
-                'ID': 'edge1-clone',
+                'BASE-ID': 'cloud',
+                'ID': f'edge-{node.id}',
                 'URI-REPLACEMENT': {
-                    'HOST': 'http://127.0.0.1:30001',
-                    'PARAMS': {
-                        'ap1': '3.71',
-                        'ap2': '5'
-                    }
+                    'HOST': node.host,
+                    'PARAMS': {}
                 }
             }
             

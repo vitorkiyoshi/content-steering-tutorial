@@ -1,40 +1,23 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
-
-########################################################################
-# IMPORTS                                                             ##
-########################################################################
-import logging
-import docker
-import os
-
 from flask import Flask
-from flask import Response
 from flask import request
 from flask import jsonify
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 
-from builder import Builder
-from monitoring import Monitoring
+from dash_parser import DashParser
+from monitor import ContainerMonitor
 
 
 # DEFINES
-########################################################################
 STEERING_ADDR = '0.0.0.0'
 STEERING_PORT = 30500
 BASE_URI      = f'http://{STEERING_ADDR}:{STEERING_PORT}'
 
-_builder    = Builder()
-_monitoring = Monitoring()
+
+# Create instances of the parsers and the container monitor
+dash_parser  = DashParser()
+monitor = ContainerMonitor()
 
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-
-# CLASSES.
 class Main:
 
     def __init__(self):
@@ -43,13 +26,16 @@ class Main:
         self.app = Flask(__name__)
         CORS(self.app)
 
-
-    
-        @self.app.route('/steering/<name>')
+        @self.app.route('/')
         def do_remote_steering(name):
-            print("entroi")
-            data = _builder.build(
-                nodes   = None,
+            trg = request.args.get('_DASH_pathway', default='', type=str)
+            thr = request.args.get('_DASH_throughput', default=0.0, type=float)
+            
+            nodes = monitor.getNodes()
+
+            data = dash_parser.build(
+                target  = trg,
+                nodes   = nodes,
                 uri     = BASE_URI,
                 request = request
             )
@@ -64,14 +50,9 @@ class Main:
 
 
 # MAIN
-#################################################
 if __name__ == '__main__':
 
-    print("entrou1")
-
-    _monitoring.start()
-
-    print("entrou2")
+    monitor.start_collecting()
 
     main = Main()
     main.run()

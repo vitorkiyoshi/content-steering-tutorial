@@ -1,15 +1,12 @@
-version: '3'
-
 name: video-streaming
 
 services:
   caddy:
-    container_name: video-streaming
     image: caddy
     restart: always
-    ports:
-      - '80:80'
-      - '443:443'
+    deploy:
+      mode: replicated
+      replicas: 2
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./certs:/root/certs
