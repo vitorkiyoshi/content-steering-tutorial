@@ -1,14 +1,25 @@
-name: video-streaming
-
 services:
-  caddy:
+  cache-1:
+    container_name: video-streaming-cache-1
     image: caddy
-    restart: always
-    deploy:
-      mode: replicated
-      replicas: 2
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./Caddyfile-1:/etc/caddy/Caddyfile
+      - ./certs:/root/certs
+      - ../dataset:/srv
+      
+  cache-2:
+    container_name: video-streaming-cache-2
+    image: caddy
+    volumes:
+      - ./Caddyfile-2:/etc/caddy/Caddyfile
+      - ./certs:/root/certs
+      - ../dataset:/srv
+      
+  cache-3:
+    container_name: video-streaming-cache-3
+    image: caddy
+    volumes:
+      - ./Caddyfile-3:/etc/caddy/Caddyfile
       - ./certs:/root/certs
       - ../dataset:/srv
       

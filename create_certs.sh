@@ -1,19 +1,19 @@
 #! /bin/bash
 echo """
 ==================================================
-  Creating certificate for streaming-service
+  Creating certificate for $1
 ==================================================
 """
-mkcert streaming-service
+mkcert $1
 
 echo """
 ==================================================
-  Copying streaming-service certificates to ./streaming-service/certs
+  Copying $1 certificates to ./$1/certs
 ==================================================
 """
 
-mv ./streaming-service.pem ./streaming-service/certs
-mv ./streaming-service-key.pem ./streaming-service/certs
+mv ./$1.pem ./$1/certs
+mv ./$1-key.pem ./$1/certs
 
 
 echo """

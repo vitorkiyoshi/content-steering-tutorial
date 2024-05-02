@@ -2,17 +2,18 @@ class DashParser:
     def __init__(self):
         pass
 
-    def build(self, nodes, uri, request):
+
+    def build(self, target, nodes, uri, request):
         message = {}
         message['VERSION'] = 1
         message['TTL'] = 10
         message['RELOAD-URI'] = f'{uri}{request.path}'
 
+        message["PATHWAY-PRIORITY"] = [f'{node[0]}' for node in nodes] + ['cloud']
+
         if nodes:
             message['PATHWAY-CLONES'] = self.pathway_clones(nodes)
         
-        message["PATHWAY-PRIORITY"] = [f'edge-{node.id}' for node in nodes] + ['cdn']
-
         return message
 
 
@@ -22,14 +23,13 @@ class DashParser:
         
         for node in nodes:
             clone = {
-                'BASE-ID': 'cloud',
-                'ID': f'edge-{node.id}',
+                'BASE-ID': f'cloud',
+                'ID': f'{node[0]}',
                 'URI-REPLACEMENT': {
-                    'HOST': node.host,
-                    'PARAMS': {}
+                    'HOST': f'https://{node[0]}'
                 }
             }
-            
+    
             clones.append(clone)
             
         return clones
