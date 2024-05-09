@@ -12,6 +12,11 @@ Video streaming is among the most used Internet applications nowadays, with many
 - [mkcert](https://github.com/FiloSottile/mkcert)
 - [docker](https://www.docker.com/)
 
+## VirtualBox VM:
+
+We provide a fully configured VirtualBox VM with all the necessary software for you to download and explore our tutorial's testbed. You can download the pre-configured VM in the following link: https://drive.google.com/file/d/1mCB585muebdJIN6yXbioIoD1762svy3T/view?usp=sharing
+
+To use the VM, you'll need VirtualBox installed on your system. For more information on how to install VirtualBox or how to import a VM image, please refer to: https://www.virtualbox.org/
 
 ## Configure Environment Tutorial:
 
