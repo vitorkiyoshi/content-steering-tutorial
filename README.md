@@ -25,9 +25,11 @@ To use the VM, you'll need VirtualBox installed on your system. For more informa
 3. Get information on the IP address of each cache node ($ docker inspect video-streaming-cache-1)
 4. For each cache node inspected, add a line in the /etc/hosts file following the pattern: 172.18.0.2  video-streaming-cache-1.
 
-172.18.0.2  video-streaming-cache-1
-172.18.0.4  video-streaming-cache-2
-172.18.0.3  video-streaming-cache-3
+```
+172.18.0.2	video-streaming-cache-1
+172.18.0.4	video-streaming-cache-2
+172.18.0.3	video-streaming-cache-3
+```
 
 5. Now the edge nodes are up and running, we need to start the content steering orchestrator. In the "Documents/content-steering-tutorial" type ($ python3 steering-service/src/app.py)
 6. Open Google Chrome and go to the video player GUI: https://reference.dashif.org/dash.js/latest/samples/advanced/content-steering.html
