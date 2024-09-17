@@ -18,6 +18,21 @@ We provide a fully configured VirtualBox VM with all the necessary software for 
 
 To use the VM, you'll need VirtualBox installed on your system. For more information on how to install VirtualBox or how to import a VM image, please refer to: https://www.virtualbox.org/
 
+### Executing the video streaming on the virtual box environment
+
+1. After starting the machine, access the folder "Documents/content-steering-tutorial" and execute the starting-streaming.sh script ($ ./starting-streaming.sh)
+2. Verify whether the docker containers started ($ docker ps)
+3. Get information on the IP address of each cache node ($ docker inspect video-streaming-cache-1)
+4. For each cache node inspected, add a line in the /etc/hosts file following the pattern: 172.18.0.2  video-streaming-cache-1.
+
+172.18.0.2  video-streaming-cache-1
+172.18.0.4  video-streaming-cache-2
+172.18.0.3  video-streaming-cache-3
+
+5. Now the edge nodes are up and running, we need to start the content steering orchestrator. In the "Documents/content-steering-tutorial" type ($ python3 steering-service/src/app.py)
+6. Open Google Chrome and go to the video player GUI: https://reference.dashif.org/dash.js/latest/samples/advanced/content-steering.html
+7. In the URL, access: https://video-streaming-cache-1/Eldorado/4sec/avc/manifest.mpd
+
 ## Configure Environment Tutorial:
 
 
