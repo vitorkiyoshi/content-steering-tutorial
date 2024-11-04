@@ -43,7 +43,17 @@ class Main:
             )
             
             print(data)
-            return jsonify(data), 200
+            return jsonify(data), 20
+        
+        @self.app.route('/coords', methods=['POST'])
+        @cross_origin()
+        def coords(name):
+            coordinates = request.json
+            print(coordinates)
+            test = "returning data from server"
+            m = {}
+            m["log"] = test
+            return jsonify(m), 200
 
 
     def run(self):

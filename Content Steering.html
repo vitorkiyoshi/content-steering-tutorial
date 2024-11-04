@@ -43,17 +43,18 @@
     <script class="code">
         let player;
         let mpd = "";
-        let currentSelectedServiceLocation = {}
+        let currentSelectedServiceLocation = {};
         let cdnSelectionImgDomElements = {};
         let locationSelectionImgDomElements = {};
-
+        let coordservers = [[0,0],[1,1],[0,1]];
+        let intervalID;
         function init() {
             player = dashjs.MediaPlayer().create();
             document.getElementById('load-button').addEventListener('click', function () {
                 _load();
             })
             document.getElementById('button_Trigger').addEventListener('click', function () {
-                coords(document.getElementById('select-coords').value);
+                coords(document.getElementById('select-coords').value, document.getElementById('latitude').value, document.getElementById('longitude').value);
             })
             player.initialize(document.querySelector("video"), null, true);
 
@@ -69,26 +70,42 @@
             player.attachSource(mpd);
         }
 
-        function coords(value) {
+        function coords(value, initlat, initlong) {
             //setInterval()
-            let time = 0;
-            let latitude,longitude;
-            switch(value){
-                case 1:
-                case 2:
-                case 3:
-                case 4
+            /*var refreshIntervalId = setInterval(fname, 10000);
+            clearInterval(refreshIntervalId);*/
+            //set time to update coordinates
+            let time = 500;
+            let steplat,steplong;
+            steplat = (coordservers[parseInt(value)][0] - initlat)/1000;
+            steplong = (coordservers[parseInt(value)][1] - initlong)/1000;
+            var latitude = parseFloat(initlat);
+            var longitude = parseFloat(initlong);
+            
+
+            function updatecoords(){
+                fetch("https://steering-service:30500/coords", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        "lat" : latitude,
+                        "long" : longitude,
+                    }),
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8"
+                    }
+                    }).then(data => {console.log(data)});
+                latitude = latitude + steplat;
+                longitude = longitude + steplong;
+                document.getElementById("instlat").value = latitude;
+                document.getElementById("instlong").value = longitude;
+
             }
-            fetch("https://steering-service:30500", {
-                method: "POST",
-                body: JSON.stringify({
-                    lat : latitude,
-                    long : longitude,
-                }),
-                headers: {
-                    "Content-type": "application/json; charset=UTF-8"
-                }
-                });
+
+            if (intervalID != null){
+                clearInterval(intervalID)
+            }
+
+            intervalID = setInterval(updatecoords, 500);
 
         }
 
@@ -399,17 +416,28 @@
                         <table class="table">
                             <tbody>
                             <tr><td>
+                                <input type="number" step="0.00001" id="latitude" placeholder="latitude"><br>
+                                <input type="number" step="0.00001" id="longitude" placeholder="longitude"></td>
+                                <td>
                                 <select name="select" id="select-coords">
-                                    <option value="1">Triangulo</option>
-                                    <option value="2">Distanciando Cache 1</option>
-                                    <option value="3">Distanciando Cache 2</option>
-                                    <option value="4">Distanciando Cache 3</option>
+                                    <option value="0">Direção Cache 1</option>
+                                    <option value="1">Direção Cache 2</option>
+                                    <option value="2">Direção Cache 3</option>
                                 </select></td>
                                 <td>
                                     <button type="button" id="button_Trigger" class="btn btn-success">Start Simulator
                                     </button>
                                 </td>
                             </tr>
+                            </tbody>
+                            <tbody>
+                                <tr>
+                                    <td>Instant Latitude: </td><td><input type="number" id="instlat"></td>
+                                </tr>
+                                <tr>
+                                    <td>Instant Longitude: </td><td><input type="number" id="instlong"></td>
+                                </tr>
+                                    
                             </tbody>
                         </table>
                     </div>
