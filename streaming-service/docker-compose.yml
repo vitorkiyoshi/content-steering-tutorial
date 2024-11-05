@@ -7,8 +7,8 @@ services:
       - ./certs:/root/certs
       - ../dataset:/srv
     environment:
-      latitude: "some_value1"
-      longitude: "another_value1"
+      LATITUDE: "-23"
+      LONGITUDE: "-47"
       
   cache-2:
     container_name: video-streaming-cache-2
@@ -18,8 +18,8 @@ services:
       - ./certs:/root/certs
       - ../dataset:/srv
     environment:
-      latitude: "some_value2"
-      longitude: "another_value2"
+      LATITUDE: "-33"
+      LONGITUDE: "-71"
       
   cache-3:
     container_name: video-streaming-cache-3
@@ -29,6 +29,6 @@ services:
       - ./certs:/root/certs
       - ../dataset:/srv
     environment:
-      latitude: "some_value3"
-      longitude: "another_value3"
+      LATITUDE: "5"
+      LONGITUDE: "-74"
       

@@ -25,9 +25,10 @@ class ContainerMonitor:
                 continue
             try:
                 stats = container.stats(stream=False)
+                attrs = container.attrs
                 networks = container.attrs['NetworkSettings']['Networks']
                 ip_address = networks.get('video-streaming_default', {}).get('IPAddress', 'N/A')
-                print(container.attrs['Config']['Env'])
+                print(container.attrs['Config']['Env']['LATITUDE'])
                 prev_stats = self.container_stats.get(container.name, [{}])[-1]
 
                 container_stats = {
