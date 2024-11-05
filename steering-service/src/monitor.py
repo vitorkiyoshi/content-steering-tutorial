@@ -1,7 +1,7 @@
 import docker
 import threading
 import math
-
+from epsilon_greedy import EpsilonGreedy
 
 # CLASS
 class ContainerMonitor:
@@ -47,7 +47,7 @@ class ContainerMonitor:
                     'rate_rx_bytes': (stats['networks']['eth0']['rx_bytes'] - prev_stats.get('rx_bytes', 0)),
                     'rate_tx_bytes': (stats['networks']['eth0']['tx_bytes'] - prev_stats.get('tx_bytes', 0)),
                     'ip_address': ip_address,  # IP address of the container
-                    'latitude': latitude
+                    'latitude': latitude,
                     'longitude': longitude
                 }
 
