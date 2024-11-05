@@ -53,6 +53,9 @@
             document.getElementById('load-button').addEventListener('click', function () {
                 _load();
             })
+            document.getElementById('button_StopTrigger').addEventListener('click', function() {
+                stopTrigger();
+            })
             document.getElementById('button_Trigger').addEventListener('click', function () {
                 coords(document.getElementById('select-coords').value, document.getElementById('latitude').value, document.getElementById('longitude').value);
             })
@@ -65,6 +68,9 @@
             player.on(dashjs.MediaPlayer.events.MANIFEST_LOADED, _onManifestLoaded, null);
         }
 
+        function stopTrigger(){
+            if (intervalID != null) clearInterval(intervalID);
+        }
         function _load() {
             mpd = document.getElementById('manifest').value;
             player.attachSource(mpd);
@@ -426,6 +432,8 @@
                                 </select></td>
                                 <td>
                                     <button type="button" id="button_Trigger" class="btn btn-success">Start Simulator
+                                    </button>
+                                    <button type="button" id="button_StopTrigger" class="btn btn-success">Stop Simulator
                                     </button>
                                 </td>
                             </tr>
