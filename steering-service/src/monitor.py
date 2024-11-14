@@ -1,14 +1,18 @@
 import docker
 import threading
 import math
-from epsilon_greedy import EpsilonGreedy
+from choice_algorithms.epsilon_greedy import EpsilonGreedy
+import latency.latency_estimator as lat_estimator
 
 # CLASS
 class ContainerMonitor:
     def __init__(self):
         self.client = docker.from_env()
         self.container_stats = {}
+        self.nodes = []
         self.interval = 2
+        self.choice_algorithm = None
+        self.latency_average = []
 
 
     def start_collecting(self):
@@ -65,7 +69,7 @@ class ContainerMonitor:
             # self.print_stats()
 
 
-    def getNodes(self, metric='tx_bytes'):
+    def getNodes(self):
         return [(name, stat[-1]['ip_address']) for name, stat in self.container_stats.items()]
 
     def print_stats(self):
@@ -81,25 +85,46 @@ class ContainerMonitor:
                 print(f"  Rate Network Output: {stats['rate_tx_bytes']}")
                 print(f"  Metrics size: {len(stats_list)}")
                 print(f"  IP address: {stats['ip_address']}")
+    
+    def log_latency_average(self, estimated_latency):
+        if not self.latency_average:
+            self.latency_average.append(estimated_latency)
+        else:
+            current_avr = (sum(self.latency_average) + estimated_latency) / (len(self.latency_average) + 1)
+            self.latency_average.append(current_avr)
+            self.latency_average = self.latency_average[-10:]
+        
+        with open("latency_average.txt", "a") as arquivo:
+            arquivo.write(f"{self.latency_average[-1]}\n")
 
-    def haversine(lat1, lon1, lat2, lon2):
-        R = 6371  # Raio da Terra em km
-        lat1, lon1 = map(math.radians, [lat1, lon1])
-        lat2, lon2 = map(math.radians, [lat2, lon2])
-        dlat = lat2 - lat1
-        dlon = lon2 - lon1
-        a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        distance = R * c
-        return distance
+    def sort_by_coord(self, lat, lon):
+        
+        # Algorithm boot
+        if not self.nodes:
+            self.nodes = self.getNodes()
 
-    def estimate_latency(lat1, lon1, lat2, lon2):
-        distance = haversine(lat1, lon1, lat2, lon2)
-        # Velocidade da luz em fibra óptica em km/s
-        speed_of_light_in_fiber = 200000  # km/s
-        # Latência mínima teórica
-        latency = (distance / speed_of_light_in_fiber) * 1000  # em ms
-        return latency
+        if self.choice_algorithm is None:
+            self.choice_algorithm = EpsilonGreedy(0.3, None, None)
+            self.choice_algorithm.initialize([name for (name, _) in self.nodes])
+        
+        print(f"[LOG][client] lat: {lat}, long: {lon}")
+
+        # Choose a server
+        self.nodes = self.choice_algorithm.select_arm(self.nodes)
+
+        # Estimate latency
+        selected_node = self.nodes[0]
+        selected_node_lat = self.container_stats[selected_node[0]][-1]['latitude']
+        selected_node_long = self.container_stats[selected_node[0]][-1]['longitude']
+        estimated_latency = lat_estimator.estimate_latency(lat, lon, selected_node_lat, selected_node_long)
+        print(f"[LOG] Selected Node: {selected_node[0]}, lat: {self.container_stats[selected_node[0]][-1]['latitude']}, long: {self.container_stats[selected_node[0]][-1]['longitude']}, larency: {estimated_latency}")
+            # recuperar latitude e longitude do servidor escolhido
+
+        # Makes update
+        self.choice_algorithm.update(selected_node[0], estimated_latency)
+        print(f"[LOG] Counts: {self.choice_algorithm.counts}")
+
+        self.log_latency_average(estimated_latency)
 
 
 # END CLASS.
