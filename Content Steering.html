@@ -46,7 +46,7 @@
         let currentSelectedServiceLocation = {};
         let cdnSelectionImgDomElements = {};
         let locationSelectionImgDomElements = {};
-        let coordservers = [[0,0],[1,1],[0,1]];
+        let coordservers = [[-23,-47],[-33,-71],[5,-74]];
         let intervalID;
         function init() {
             player = dashjs.MediaPlayer().create();
@@ -81,7 +81,7 @@
             /*var refreshIntervalId = setInterval(fname, 10000);
             clearInterval(refreshIntervalId);*/
             //set time to update coordinates
-            let time = 500;
+            let time = 100;
             let steplat,steplong;
             steplat = (coordservers[parseInt(value)][0] - initlat)/1000;
             steplong = (coordservers[parseInt(value)][1] - initlong)/1000;

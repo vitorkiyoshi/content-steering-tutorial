@@ -1,8 +1,6 @@
 import random
-import numpy as np
 
 NODE_NAME = 0
-
 
 class EpsilonGreedy():
     def __init__(self, epsilon, counts, values):
@@ -23,7 +21,7 @@ class EpsilonGreedy():
         # If prob is not in epsilon, do exploitation of best arm so far
         if random.random() > self.epsilon:
             # Sort the list of servers based on values (less, better)
-            return sorted(nodes, key=lambda node: self.values(node[NODE_NAME]))
+            return sorted(nodes, key=lambda node: self.values[node[NODE_NAME]])
         # If prob falls in epsilon range, do exploration
         else:
             # Do a shuffle and return list of nodes
@@ -31,13 +29,13 @@ class EpsilonGreedy():
             return nodes
     
     # Choose to update chosen arm and punishment
-    def update(self, chosen_arm, punishment):
+    def update(self, chosen_arm_name, punishment):
         # update counts pulled for chosen arm
-        self.counts[chosen_arm] = self.counts[chosen_arm] + 1
-        n = self.counts[chosen_arm]
+        self.counts[chosen_arm_name] = self.counts[chosen_arm_name] + 1
+        n = self.counts[chosen_arm_name]
         
         # Update average/mean value/punishment for chosen arm
-        value = self.values[chosen_arm]
+        value = self.values[chosen_arm_name]
         new_value = ((n-1)/float(n)) * value + (1 / float(n)) * punishment
-        self.values[chosen_arm] = new_value
+        self.values[chosen_arm_name] = new_value
         return

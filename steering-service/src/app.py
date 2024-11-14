@@ -33,6 +33,7 @@ class Main:
 
             nodes = monitor.getNodes('ip_address')
 
+            print("alooo")
             print(nodes)
 
             data = dash_parser.build(
@@ -46,13 +47,13 @@ class Main:
             return jsonify(data), 20
         
         @self.app.route('/coords', methods=['POST'])
-        @cross_origin()
-        def coords(name):
+        def coords():
             coordinates = request.json
             print(coordinates)
             test = "returning data from server"
             m = {}
             m["log"] = test
+            monitor.sort_by_coord(coordinates['lat'], coordinates['long'])
             return jsonify(m), 200
 
 
