@@ -31,7 +31,7 @@ class Main:
             tar = request.args.get('_DASH_pathway', default='', type=str)
             thr = request.args.get('_DASH_throughput', default=0.0, type=float)
 
-            nodes = monitor.getNodes('ip_address')
+            nodes = monitor.getNodes()
 
             print("alooo")
             print(nodes)
@@ -44,7 +44,7 @@ class Main:
             )
             
             print(data)
-            return jsonify(data), 20
+            return jsonify(data), 200
         
         @self.app.route('/coords', methods=['POST'])
         def coords():
