@@ -119,7 +119,9 @@ class ContainerMonitor:
         selected_node = self.nodes[0]
         selected_node_lat = self.container_stats[selected_node[0]][-1]['latitude']
         selected_node_long = self.container_stats[selected_node[0]][-1]['longitude']
-        estimated_latency = lat_estimator.estimate_latency(lat, lon, selected_node_lat, selected_node_long)
+        selected_node_cpu = self.container_stats[selected_node[0]][-1]['cpu_usage']
+        selected_node_mem = self.container_stats[selected_node[0]][-1]['mem_usage']
+        estimated_latency = lat_estimator.estimate_latency(lat, lon, selected_node_lat, selected_node_long, selected_node_cpu, selected_node_mem)
         print(f"[LOG] Selected Node: {selected_node[0]}, lat: {self.container_stats[selected_node[0]][-1]['latitude']}, long: {self.container_stats[selected_node[0]][-1]['longitude']}, larency: {estimated_latency}")
             # recuperar latitude e longitude do servidor escolhido
 
