@@ -85,7 +85,7 @@
             if (interval_spam != null){
                 clearInterval(interval_spam);
             }
-            interval_spam = setInterval(get_video, 300);
+            interval_spam = setInterval(get_video, 100);
             
         }
         function stopTrigger(interval){
@@ -131,7 +131,7 @@
                 clearInterval(intervalID)
             }
 
-            intervalID = setInterval(updatecoords, 500);
+            intervalID = setInterval(updatecoords, 100);
 
         }
 
@@ -141,6 +141,18 @@
                     if (e.request.serviceLocation) {
                         const element = document.getElementById(`${e.mediaType}-service-location`);
                         element.innerText = e.request.serviceLocation;
+                        
+                        if (currentSelectedServiceLocation.video != undefined){
+                            let start = performance.now();
+                            let host = "https://"+currentSelectedServiceLocation.video+"/Eldorado/health-check.json";
+                            fetch(host)
+                                .then(data => {
+                                    const end = performance.now();
+                                    const duration = end - start; // duração em milissegundos
+                                    console.log(`Request duration: ${duration.toFixed(2)} ms`);
+                                })
+                        }
+
                         if (!currentSelectedServiceLocation[e.mediaType] || currentSelectedServiceLocation[e.mediaType] !== e.request.serviceLocation) {
                             currentSelectedServiceLocation[e.mediaType] = e.request.serviceLocation;
                             _serviceLocationChanged(currentSelectedServiceLocation, cdnSelectionImgDomElements);
@@ -315,7 +327,7 @@
         <div class="row mt-4">
             <div class="col-md-12">
                 <div class="input-group mb-3">
-                    <input type="text" id="manifest" class="form-control" placeholder="MPD URL" value="https://www.content-steering.com/bbb/playlist_steering_cloudfront_https.mpd">
+                    <input type="text" id="manifest" class="form-control" placeholder="MPD URL" value="https://video-streaming-cache-1/Eldorado/4sec/avc/manifest.mpd">
                     <button type="button" id="load-button" class="btn btn-success">Load MPD
                     </button>
                 </div>
