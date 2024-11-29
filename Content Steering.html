@@ -46,9 +46,11 @@
         let currentSelectedServiceLocation = {};
         let cdnSelectionImgDomElements = {};
         let locationSelectionImgDomElements = {};
-        let coordservers = [[-23,-47],[-33,-71],[5,-74]];
+        let coordservers = [0,0];
         let intervalID;
         let interval_spam;
+        let latitude=0;
+        let longitude=0;
         function init() {
             player = dashjs.MediaPlayer().create();
             document.getElementById('load-button').addEventListener('click', function () {
@@ -58,7 +60,7 @@
                 stopTrigger(intervalID);
             })
             document.getElementById('button_Trigger').addEventListener('click', function () {
-                coords(document.getElementById('select-coords').value, document.getElementById('latitude').value, document.getElementById('longitude').value);
+                coords(document.getElementById('latitude_f').value, document.getElementById('longitude_f').value, document.getElementById('latitude').value, document.getElementById('longitude').value);
             })
             document.getElementById('switch_spam').addEventListener('change', function () {
                 if(this.checked){
@@ -96,35 +98,24 @@
             player.attachSource(mpd);
         }
 
-        function coords(value, initlat, initlong) {
+        function coords(flat, flong, initlat, initlong) {
             //setInterval()
             /*var refreshIntervalId = setInterval(fname, 10000);
             clearInterval(refreshIntervalId);*/
             //set time to update coordinates
             let time = 100;
             let steplat,steplong;
-            steplat = (coordservers[parseInt(value)][0] - initlat)/1000;
-            steplong = (coordservers[parseInt(value)][1] - initlong)/1000;
-            var latitude = parseFloat(initlat);
-            var longitude = parseFloat(initlong);
+            steplat = (flat - initlat)/1000;
+            steplong = (flong - initlong)/1000;
+            latitude = parseFloat(initlat);
+            longitude = parseFloat(initlong);
             
 
             function updatecoords(){
-                fetch("https://steering-service:30500/coords", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        "lat" : latitude,
-                        "long" : longitude,
-                    }),
-                    headers: {
-                        "Content-type": "application/json; charset=UTF-8"
-                    }
-                    }).then(data => {console.log(data)});
                 latitude = latitude + steplat;
                 longitude = longitude + steplong;
                 document.getElementById("instlat").value = latitude;
                 document.getElementById("instlong").value = longitude;
-
             }
 
             if (intervalID != null){
@@ -151,7 +142,17 @@
                                     const duration = end - start; // duração em milissegundos
                                     console.log(`Request duration: ${duration.toFixed(2)} ms`);
                                 })
-
+                                fetch("https://steering-service:30500/coords", {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    "lat" : latitude,
+                                    "long" : longitude,
+                                    "rt" : duration
+                                }),
+                                headers: {
+                                    "Content-type": "application/json; charset=UTF-8"
+                                }
+                                }).then(data => {console.log(data)});
                                 // lat, long, duration
                         }
 
@@ -482,14 +483,11 @@
                         <table class="table">
                             <tbody>
                             <tr><td>
-                                <input type="number" step="0.00001" id="latitude" placeholder="latitude"><br>
-                                <input type="number" step="0.00001" id="longitude" placeholder="longitude"></td>
+                                <input type="number" step="0.00001" id="latitude" placeholder="latitude Init"><br>
+                                <input type="number" step="0.00001" id="longitude" placeholder="longitude Init"></td>
                                 <td>
-                                <select name="select" id="select-coords">
-                                    <option value="0">Direção Cache 1</option>
-                                    <option value="1">Direção Cache 2</option>
-                                    <option value="2">Direção Cache 3</option>
-                                </select></td>
+                                <input type="number" step="0.00001" id="latitude_f" placeholder="latitude Final"><br>
+                                <input type="number" step="0.00001" id="longitude_f" placeholder="longitude Final"></td>
                                 <td>
                                     <button type="button" id="button_Trigger" class="btn btn-success">Start Simulator
                                     </button>

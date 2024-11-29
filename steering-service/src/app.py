@@ -48,12 +48,13 @@ class Main:
         
         @self.app.route('/coords', methods=['POST'])
         def coords():
-            coordinates = request.json
-            print(coordinates)
+            #lat,long,rt
+            list_request = request.json
+            print(list_request)
             test = "returning data from server"
             m = {}
             m["log"] = test
-            monitor.sort_by_coord(coordinates['lat'], coordinates['long'])
+            monitor.sort_by_coord(list_request['lat'], list_request['long'])
             return jsonify(m), 200
 
 
