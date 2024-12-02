@@ -14,7 +14,7 @@ def haversine(lat1, lon1, lat2, lon2):
     distance = R * c
     return distance
 
-def estimate_latency(lat1, lon1, lat2, lon2, cpu_usage, mem_usage):
+def estimate_latency(lat1, lon1, lat2, lon2):
     
     # Distance effect
     distance = haversine(lat1, lon1, lat2, lon2)
@@ -22,16 +22,4 @@ def estimate_latency(lat1, lon1, lat2, lon2, cpu_usage, mem_usage):
     speed_of_light_in_fiber = 200000  # km/s
     # Theoretical minimum latency
     distance_latency = (distance / speed_of_light_in_fiber) * 1000  # in ms
-
-    # CPU Usage effect
-    t_base = 5 #ms
-    alpha = 0.5
-    k = 2
-    cpu_latency = t_base * (1 + alpha * (cpu_usage ** k))
-
-    # Memory usage
-    beta = 0.7
-    m = 2
-    mem_latency = t_base * (1 + alpha * (mem_usage ** m))
-
-    return distance_latency + cpu_latency + mem_latency
+    return distance_latency

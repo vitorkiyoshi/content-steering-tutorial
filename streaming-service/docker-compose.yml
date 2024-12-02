@@ -2,10 +2,15 @@ services:
   cache-1:
     container_name: video-streaming-cache-1
     image: caddy
+    mem_limit: 512m
+    mem_reservation: 128M
+    memswap_limit: 1g
+    cpus: "0.3"
+    cpuset: "1"
     volumes:
       - ./Caddyfile-1:/etc/caddy/Caddyfile
       - ./certs:/root/certs
-      - ../dataset:/srv
+      - ../dataset1:/srv
     environment:
       LATITUDE: "-23"
       LONGITUDE: "-47"
@@ -13,10 +18,15 @@ services:
   cache-2:
     container_name: video-streaming-cache-2
     image: caddy
+    mem_limit: 512m
+    mem_reservation: 128M
+    memswap_limit: 1g
+    cpus: "0.3"
+    cpuset: "1"
     volumes:
       - ./Caddyfile-2:/etc/caddy/Caddyfile
       - ./certs:/root/certs
-      - ../dataset:/srv
+      - ../dataset2:/srv
     environment:
       LATITUDE: "-33"
       LONGITUDE: "-71"
@@ -24,10 +34,15 @@ services:
   cache-3:
     container_name: video-streaming-cache-3
     image: caddy
+    mem_limit: 512m
+    mem_reservation: 128M
+    memswap_limit: 1g
+    cpus: "0.3"
+    cpuset: "1"
     volumes:
       - ./Caddyfile-3:/etc/caddy/Caddyfile
       - ./certs:/root/certs
-      - ../dataset:/srv
+      - ../dataset3:/srv
     environment:
       LATITUDE: "5"
       LONGITUDE: "-74"

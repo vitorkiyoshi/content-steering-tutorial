@@ -49,8 +49,12 @@
         let coordservers = [0,0];
         let intervalID;
         let interval_spam;
-        let latitude=0;
-        let longitude=0;
+        let latitude=-17;
+        let longitude=-64;
+        let requestId = 0;
+        let fragmentTimings = {};
+        let responseTimes = [];
+        let averageLatency = 0;
         function init() {
             player = dashjs.MediaPlayer().create();
             document.getElementById('load-button').addEventListener('click', function () {
@@ -72,12 +76,24 @@
             })
             player.initialize(document.querySelector("video"), null, true);
 
+            player.updateSettings({
+                streaming: {
+                    buffer: {
+                        initialBufferLevel: 0, // Tamanho inicial do buffer
+                        stableBufferTime: 0,  // Tamanho do buffer durante a reprodução
+                        bufferTimeAtTopQuality: 2,
+                    },
+                },
+            });
+
             player.on(dashjs.MediaPlayer.events.FRAGMENT_LOADING_STARTED, _onFragmentLoadingStarted, null);
+            player.on(dashjs.MediaPlayer.events.FRAGMENT_LOADING_COMPLETED, _onFragmentLoadingCompleted, null);
             player.on(dashjs.MediaPlayer.events.MANIFEST_LOADING_STARTED, _onManifestLoadingStarted, null);
             player.on(dashjs.MediaPlayer.events.CONTENT_STEERING_REQUEST_COMPLETED, _onContentSteeringRequestCompleted, null);
             player.on(dashjs.MediaPlayer.events.BASE_URLS_UPDATED, _onBaseUrlsUpdated, null);
             player.on(dashjs.MediaPlayer.events.MANIFEST_LOADED, _onManifestLoaded, null);
         }
+
         function spam_cache(value){
             let server = parseInt(value)+1;
             let host = "https://video-streaming-cache-"+server.toString()+"/Eldorado/4sec/avc/7500000/seg-1.m4s";
@@ -90,6 +106,15 @@
             interval_spam = setInterval(get_video, 100);
             
         }
+
+        function add_rt(value){
+            if (responseTimes.length >= 5) {
+                responseTimes.shift();
+            }
+            responseTimes.push(value)
+            averageLatency = responseTimes.length > 0 ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length : -1;
+        }
+
         function stopTrigger(interval){
             if (interval != null) clearInterval(interval);
         }
@@ -132,29 +157,6 @@
                     if (e.request.serviceLocation) {
                         const element = document.getElementById(`${e.mediaType}-service-location`);
                         element.innerText = e.request.serviceLocation;
-                        
-                        if (currentSelectedServiceLocation.video != undefined){
-                            let start = performance.now();
-                            let host = "https://"+currentSelectedServiceLocation.video+"/Eldorado/health-check.json";
-                            fetch(host)
-                                .then(data => {
-                                    const end = performance.now();
-                                    const duration = end - start; // duração em milissegundos
-                                    console.log(`Request duration: ${duration.toFixed(2)} ms`);
-                                })
-                                fetch("https://steering-service:30500/coords", {
-                                method: "POST",
-                                body: JSON.stringify({
-                                    "lat" : latitude,
-                                    "long" : longitude,
-                                    "rt" : duration
-                                }),
-                                headers: {
-                                    "Content-type": "application/json; charset=UTF-8"
-                                }
-                                }).then(data => {console.log(data)});
-                                // lat, long, duration
-                        }
 
                         if (!currentSelectedServiceLocation[e.mediaType] || currentSelectedServiceLocation[e.mediaType] !== e.request.serviceLocation) {
                             currentSelectedServiceLocation[e.mediaType] = e.request.serviceLocation;
@@ -168,6 +170,57 @@
                 }
             } catch (e) {
                 console.error(e);
+            }
+        }
+
+        function _onFragmentLoadingCompleted(e) {
+            if (currentSelectedServiceLocation.video != undefined){
+
+                fetch("https://steering-service:30500/estimate-latency", {
+                                        method: "POST",
+                                        body: JSON.stringify({
+                                            "latitude" : latitude,
+                                            "longitude" : longitude,
+                                            "selected_node" : currentSelectedServiceLocation.video
+                                        }),
+                                        headers: {
+                                            "Content-type": "application/json; charset=UTF-8"
+                                        }
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        let distanceLatency = data.estimated_latency_ms
+                                        let fragmentSize = e.request.bytesTotal;
+                                        let downloadTime = e.request.requestEndDate.getTime() - e.request.requestStartDate.getTime();
+                                        let downloadRate = (fragmentSize / downloadTime) * 1000;
+                                        let start = performance.now();
+                                        let host = "https://"+currentSelectedServiceLocation.video+"/Eldorado/health-check.json";
+                                        fetch(host, {cache: "no-store"})
+                                        .then(data => {
+                                            const end = performance.now();
+                                            const req_duration = end - start; // duração em milissegundos
+                                            const duration = distanceLatency + req_duration
+                                            console.log("[Fragment Loading Completed]")
+                                            console.log(`Selected server: ${currentSelectedServiceLocation.video}`);
+                                            console.log(`Request duration: ${duration.toFixed(2)} ms`);
+                                            // console.log(`Fragmente download time: ${downloadTime.toFixed(2)} ms`);
+                                            // console.log(`Fragment Size: ${fragmentSize} bytes`);
+                                            // console.log(`Fragment download rate: ${downloadRate.toFixed(2)} bytes/s`);
+                                            add_rt(duration);
+                                            console.log(`Average latency: ${averageLatency.toFixed(2)} ms`);
+                                            fetch("https://steering-service:30500/update",{
+                                                method: "POST",
+                                                body: JSON.stringify({
+                                                    "selected_node" : currentSelectedServiceLocation.video,
+                                                    "rt": duration
+                                                }),
+                                                headers: {
+                                                    "Content-type": "application/json; charset=UTF-8"
+                                                }
+                                            })
+                                        })
+                                    })
+
             }
         }
 
@@ -287,6 +340,16 @@
                         document.getElementById(`steering-pathway-priority`).innerText = e.currentSteeringResponseData.pathwayPriority.toString();
                         document.getElementById(`steering-pathway-cloning`).innerText = JSON.stringify(e.currentSteeringResponseData.pathwayClones, null, '\t');
                     }
+                    console.log("[Content Steering]")
+                    fetch("https://steering-service:30500/sort_nodes", {
+                                    method: "POST",
+                                    body: JSON.stringify({}),
+                                    headers: {
+                                        "Content-type": "application/json; charset=UTF-8"
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => console.log(data.selected));
                 }
             } catch (e) {
                 console.error(e);

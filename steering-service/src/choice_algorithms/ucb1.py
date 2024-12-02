@@ -27,15 +27,17 @@ class UCB1():
         for node in nodes:
             bonus = math.sqrt((2 * math.log(total_counts)) / float(self.counts[node[NODE_NAME]]))
             ucb_values[node[NODE_NAME]] = self.values[node[NODE_NAME]] + bonus
-        return sorted(nodes, key=lambda node: ucb_values[node[NODE_NAME]])
+        return sorted(nodes, key=lambda node: ucb_values[node[NODE_NAME]], reverse=True)
     
-    # Choose to update chosen arm and punishment
-    def update(self, chosen_arm_name, punishment):
+    # Choose to update chosen arm and reward
+    def update(self, chosen_arm_name, latency):
+        # Converts latency in reward
+        reward = 1000 / latency
         self.counts[chosen_arm_name] = self.counts[chosen_arm_name] + 1
         n = self.counts[chosen_arm_name]
         
-        # Update average/mean value/punishment for chosen arm
+        # Update average/mean value/reward for chosen arm
         value = self.values[chosen_arm_name]
-        new_value = ((n - 1) / float(n)) * value + (1 / float(n)) * punishment
+        new_value = ((n - 1) / float(n)) * value + (1 / float(n)) * reward
         self.values[chosen_arm_name] = new_value
         return

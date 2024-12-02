@@ -13,6 +13,7 @@ class ContainerMonitor:
         self.nodes = []
         self.interval = 2
         self.choice_algorithm = None
+        self.last_selected_node = None
         self.latency_average = []
 
 
@@ -71,7 +72,10 @@ class ContainerMonitor:
 
 
     def getNodes(self):
-        return [(name, stat[-1]['ip_address']) for name, stat in self.container_stats.items()]
+        if not self.nodes:
+            return [(name, stat[-1]['ip_address']) for name, stat in self.container_stats.items()]
+        
+        return self.nodes
 
     def print_stats(self):
         for name, stats_list in self.container_stats.items():
@@ -87,49 +91,44 @@ class ContainerMonitor:
                 print(f"  Metrics size: {len(stats_list)}")
                 print(f"  IP address: {stats['ip_address']}")
     
-    def log_latency_average(self, estimated_latency):
-        if not self.latency_average:
-            self.latency_average.append(estimated_latency)
-        else:
-            current_avr = (sum(self.latency_average) + estimated_latency) / (len(self.latency_average) + 1)
-            self.latency_average.append(current_avr)
-            self.latency_average = self.latency_average[-10:]
-        
-        with open("latency_average.txt", "a") as arquivo:
-            arquivo.write(f"{self.latency_average[-1]}\n")
+    def estimate_latency(self, lat, lon, selected_node):
+            selected_node_lat = self.container_stats[selected_node][-1]['latitude']
+            selected_node_lon = self.container_stats[selected_node][-1]['longitude']
+            # Estimante lat_distance
+            response = lat_estimator.estimate_latency(lat, lon, selected_node_lat, selected_node_lon)
+            return response
 
-    def sort_by_coord(self, lat, lon):
-        
+    def algorith_boot(self, algorithm):
         # Algorithm boot
         if not self.nodes:
             self.nodes = self.getNodes()
 
         if self.choice_algorithm is None:
-            # self.choice_algorithm = EpsilonGreedy(0.3, None, None)
-            # self.choice_algorithm.initialize([name for (name, _) in self.nodes])
-            self.choice_algorithm = UCB1(None, None)
-            self.choice_algorithm.initialize([name for (name, _) in self.nodes])
-        
-        print(f"[LOG][client] lat: {lat}, long: {lon}")
+            if algorithm.lower() == 'greedy':
+                print("Setting up Greedy algorithm")
+                self.choice_algorithm = EpsilonGreedy(0.3, None, None)
+                self.choice_algorithm.initialize([name for (name, _) in self.nodes])
+            elif algorithm.lower() == 'ucb1':
+                print("Setting up UCB1 algorithm")
+                self.choice_algorithm = UCB1(None, None)
+                self.choice_algorithm.initialize([name for (name, _) in self.nodes])
+            else:
+                print("Not valid algorithm provided, setting up to random choice")
+                self.choice_algorithm = EpsilonGreedy(0.3, None, None)
+                self.choice_algorithm.initialize([name for (name, _) in self.nodes])
 
+    def sort_nodes(self):
+            
         # Choose a server
         self.nodes = self.choice_algorithm.select_arm(self.nodes)
-
-        # Estimate latency
         selected_node = self.nodes[0]
-        selected_node_lat = self.container_stats[selected_node[0]][-1]['latitude']
-        selected_node_long = self.container_stats[selected_node[0]][-1]['longitude']
-        selected_node_cpu = self.container_stats[selected_node[0]][-1]['cpu_usage']
-        selected_node_mem = self.container_stats[selected_node[0]][-1]['mem_usage']
-        estimated_latency = lat_estimator.estimate_latency(lat, lon, selected_node_lat, selected_node_long, selected_node_cpu, selected_node_mem)
-        print(f"[LOG] Selected Node: {selected_node[0]}, lat: {self.container_stats[selected_node[0]][-1]['latitude']}, long: {self.container_stats[selected_node[0]][-1]['longitude']}, larency: {estimated_latency}")
-            # recuperar latitude e longitude do servidor escolhido
+        return selected_node[0]
+    
+    def update(self, selected_node, rt):
 
-        # Makes update
-        self.choice_algorithm.update(selected_node[0], estimated_latency)
+        self.choice_algorithm.update(selected_node, rt)
         print(f"[LOG] Counts: {self.choice_algorithm.counts}")
-
-        self.log_latency_average(estimated_latency)
+        print(f"[LOG] Values: {self.choice_algorithm.values}")
 
 
 # END CLASS.
