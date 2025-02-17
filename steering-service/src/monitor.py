@@ -3,6 +3,7 @@ import threading
 import math
 from choice_algorithms.epsilon_greedy import EpsilonGreedy
 from choice_algorithms.ucb1 import UCB1
+from choice_algorithms.absolut_greedy import AbsolutGreedy
 import latency.latency_estimator as lat_estimator
 
 # CLASS
@@ -104,8 +105,12 @@ class ContainerMonitor:
             self.nodes = self.getNodes()
 
         if self.choice_algorithm is None:
-            if algorithm.lower() == 'greedy':
-                print("Setting up Greedy algorithm")
+            if algorithm.lower() == 'absolut_greedy':
+                print("Setting up Absolut Greedy algorithm")
+                self.choice_algorithm = AbsolutGreedy(None, None)
+                self.choice_algorithm.initialize([name for (name, _) in self.nodes])
+            elif algorithm.lower() == 'egreedy':
+                print("Setting up Epsilon Greedy algorithm")
                 self.choice_algorithm = EpsilonGreedy(0.3, None, None)
                 self.choice_algorithm.initialize([name for (name, _) in self.nodes])
             elif algorithm.lower() == 'ucb1':

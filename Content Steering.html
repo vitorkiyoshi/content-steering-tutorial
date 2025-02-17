@@ -46,7 +46,7 @@
         let currentSelectedServiceLocation = {};
         let cdnSelectionImgDomElements = {};
         let locationSelectionImgDomElements = {};
-        let coordservers = [0,0];
+        let coordservers = [-27.59667, -48.54917];
         let intervalID;
         let interval_spam;
         let latitude=-17;
@@ -54,10 +54,13 @@
         let requestId = 0;
         let fragmentTimings = {};
         let responseTimes = [];
+        let responseTimesNotShifted = [];
         let averageLatency = 0;
+        let averageLatencyNotShifted = 0;
         function init() {
             player = dashjs.MediaPlayer().create();
             document.getElementById('load-button').addEventListener('click', function () {
+                coords(document.getElementById('latitude_f').value, document.getElementById('longitude_f').value, document.getElementById('latitude').value, document.getElementById('longitude').value);
                 _load();
             })
             document.getElementById('button_StopTrigger').addEventListener('click', function() {
@@ -113,6 +116,11 @@
             }
             responseTimes.push(value)
             averageLatency = responseTimes.length > 0 ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length : -1;
+        }
+
+        function add_rt_not_shifted(value){
+            responseTimesNotShifted.push(value)
+            averageLatencyNotShifted = responseTimesNotShifted.length > 0 ? responseTimesNotShifted.reduce((a, b) => a + b, 0) / responseTimesNotShifted.length : -1;
         }
 
         function stopTrigger(interval){
@@ -200,19 +208,22 @@
                                             const end = performance.now();
                                             const req_duration = end - start; // duração em milissegundos
                                             const duration = distanceLatency + req_duration
-                                            console.log("[Fragment Loading Completed]")
+                                            console.log("[Fragment Loading Completed]");
                                             console.log(`Selected server: ${currentSelectedServiceLocation.video}`);
+                                            console.log(`Request duration (only distance): ${distanceLatency.toFixed(2)} ms`);
                                             console.log(`Request duration: ${duration.toFixed(2)} ms`);
                                             // console.log(`Fragmente download time: ${downloadTime.toFixed(2)} ms`);
                                             // console.log(`Fragment Size: ${fragmentSize} bytes`);
                                             // console.log(`Fragment download rate: ${downloadRate.toFixed(2)} bytes/s`);
                                             add_rt(duration);
+                                            add_rt_not_shifted(duration);
                                             console.log(`Average latency: ${averageLatency.toFixed(2)} ms`);
+                                            console.log(`Overall Average latency: ${averageLatencyNotShifted.toFixed(2)} ms`);
                                             fetch("https://steering-service:30500/update",{
                                                 method: "POST",
                                                 body: JSON.stringify({
                                                     "selected_node" : currentSelectedServiceLocation.video,
-                                                    "rt": duration
+                                                    "rt": duration /*Change here to use only distance component when needed*/
                                                 }),
                                                 headers: {
                                                     "Content-type": "application/json; charset=UTF-8"
@@ -546,11 +557,11 @@
                         <table class="table">
                             <tbody>
                             <tr><td>
-                                <input type="number" step="0.00001" id="latitude" placeholder="latitude Init"><br>
-                                <input type="number" step="0.00001" id="longitude" placeholder="longitude Init"></td>
+                                <input type="number" step="0.00001" value ="-27.59667" id="latitude" placeholder="latitude Init"><br>
+                                <input type="number" step="0.00001" value="-48.54917" id="longitude" placeholder="longitude Init"></td>
                                 <td>
-                                <input type="number" step="0.00001" id="latitude_f" placeholder="latitude Final"><br>
-                                <input type="number" step="0.00001" id="longitude_f" placeholder="longitude Final"></td>
+                                <input type="number" step="0.00001" value="4.60971" id="latitude_f" placeholder="latitude Final"><br>
+                                <input type="number" step="0.00001" value="-74.08175" id="longitude_f" placeholder="longitude Final"></td>
                                 <td>
                                     <button type="button" id="button_Trigger" class="btn btn-success">Start Simulator
                                     </button>

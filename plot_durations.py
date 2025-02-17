@@ -45,11 +45,18 @@ plt.figure(figsize=(12, 6))
 for i, duration in enumerate(request_durations):
     plt.bar(i, duration, color=colors[selected_servers[i]])
 
+
+
 # Adicionar rótulos e legenda
 plt.title("Request Duration by Selected Server")
 plt.xlabel("Request Index")
 plt.ylabel("Request Duration (ms)")
-plt.xticks(range(len(request_durations)), range(1, len(request_durations) + 1))
+# Configurar rótulos no eixo X a cada 10 requisições
+total_requests = len(request_durations)
+ticks = range(0, total_requests, 10)  # Posição dos ticks a cada 10 índices
+# tick_labels = [i + 1 for i in tick_positions]  # Números das requisições em base 1
+plt.xticks(ticks, ticks)  # Configurar as posições e os rótulos dos ticks
+# plt.xticks(range(len(request_durations)), range(1, len(request_durations) + 1))
 plt.legend([plt.Rectangle((0, 0), 1, 1, color=colors[server]) for server in unique_servers], unique_servers, title="Selected Server")
 plt.grid(axis="y", linestyle="--", alpha=0.7)
 

@@ -12,8 +12,8 @@ services:
       - ./certs:/root/certs
       - ../dataset1:/srv
     environment:
-      LATITUDE: "-23"
-      LONGITUDE: "-47"
+      LATITUDE: "4.60971"
+      LONGITUDE: "-74.08175"
       
   cache-2:
     container_name: video-streaming-cache-2
@@ -28,8 +28,8 @@ services:
       - ./certs:/root/certs
       - ../dataset2:/srv
     environment:
-      LATITUDE: "-33"
-      LONGITUDE: "-71"
+      LATITUDE: "-22.90556"
+      LONGITUDE: "-47.06083"
       
   cache-3:
     container_name: video-streaming-cache-3
@@ -44,6 +44,6 @@ services:
       - ./certs:/root/certs
       - ../dataset3:/srv
     environment:
-      LATITUDE: "5"
-      LONGITUDE: "-74"
+      LATITUDE: "-33.45694"
+      LONGITUDE: "-70.64827"
       
